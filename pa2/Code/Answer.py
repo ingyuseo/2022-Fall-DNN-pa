@@ -40,10 +40,8 @@ class ReLU:
             self.out : Values applied elementwise ReLU function on input 'z'.
         """
         self.out = None
-        # =============================== EDIT HERE ===============================
         self.zero_mask = (z<=0).astype(np.int) # if z <=0, mask is 1, else 0 
         self.out = np.maximum(0, z) 
-        # =========================================================================
         return self.out
 
     def backward(self, d_prev, reg_lambda):
@@ -61,9 +59,7 @@ class ReLU:
             dz : Gradients w.r.t. ReLU input z.
         """
         dz = None
-        # =============================== EDIT HERE ===============================
         dz = d_prev * (1 - self.zero_mask) # if input <=0, gradient is 0, else 1
-        # =========================================================================
         return dz
 
     def update(self, learning_rate):
@@ -99,10 +95,8 @@ class LeakyReLU:
             self.out : Values applied elementwise Leaky ReLU function on input 'z'.
         """
         self.out = None
-        # =============================== EDIT HERE ===============================
         self.mask = (z<=0).astype(np.int)
         self.out = np.maximum(self.alpha*z, z) 
-        # =========================================================================
         return self.out
 
     def backward(self, d_prev, reg_lambda):
@@ -119,12 +113,10 @@ class LeakyReLU:
             dz : Gradients w.r.t. Leaky ReLU input z.
         """
         dz = None
-        # =============================== EDIT HERE ===============================
         dz = self.out
         dz[dz > 0] = 1
         dz[dz <= 0] = self.alpha
         dz = dz* d_prev
-        # =========================================================================
         return dz
 
     def update(self, learning_rate):
@@ -159,10 +151,8 @@ class ELU:
             self.out : Values applied elementwise ELU function on input 'z'.
         """
         self.out = None
-        # =============================== EDIT HERE ===============================
         self.out = z
         self.out[self.out <= 0] = self.alpha*(np.exp(self.out[self.out <= 0]) - 1)
-        # =========================================================================
         return self.out
 
     def backward(self, d_prev, reg_lambda):
@@ -179,12 +169,10 @@ class ELU:
             dz : Gradients w.r.t. Leaky ReLU input z.
         """
         dz = None
-        # =============================== EDIT HERE ===============================
         dz = self.out
         dz[dz > 0] = 1
         dz[dz <= 0] += self.alpha 
         dz = dz*d_prev
-        # =========================================================================
         return dz
 
     def update(self, learning_rate):
@@ -233,9 +221,7 @@ class FCLayer:
             x = x.reshape(batch_size, -1)
 
         self.x = x
-        # =============================== EDIT HERE ===============================
         self.out = np.dot(self.x, self.W) + self.b
-        # =========================================================================
         return self.out
 
     def backward(self, d_prev, reg_lambda):
@@ -254,13 +240,13 @@ class FCLayer:
         dx = None           # Gradient w.r.t. input x
         self.dW = None      # Gradient w.r.t. weight (self.W)
         self.db = None      # Gradient w.r.t. bias (self.b)
-        # =============================== EDIT HERE ===============================
+
         dx = np.dot(d_prev, self.W.T)
         dx = dx.reshape(self.x.shape)
         reshaped_x = self.x.reshape(self.x.shape[0], -1)
         self.dW = reshaped_x.T.dot(d_prev)
         self.db = np.sum(d_prev, axis=0)
-        # =========================================================================
+
         # L2 regularization
         self.dW = self.dW + reg_lambda * self.W
         return dx
@@ -305,9 +291,7 @@ class SoftmaxLayer:
         - Shape: (batch_size, # of class)
         """
         self.y_hat = None
-        # =============================== EDIT HERE ===============================
         self.y_hat = softmax(x)
-        # =========================================================================
         return self.y_hat
 
     def backward(self, d_prev=1, reg_lambda=0):
@@ -329,11 +313,9 @@ class SoftmaxLayer:
         """
         batch_size = self.y.shape[0]
         dx = None
-        # =============================== EDIT HERE ===============================
         if self.y.ndim == 1:
             batch_size = 1
         dx = (self.y_hat - self.y) / batch_size
-        # =========================================================================
         return dx
 
 
@@ -357,14 +339,13 @@ class SoftmaxLayer:
         eps = 1e-10
         self.y_hat = y_hat
         self.y = y
-        # =============================== EDIT HERE ===============================
+
         if self.y.ndim == 1:
             self.y_hat = self.y_hat.reshape(1, self.y_hat.size)
             self.y = self.y.reshape(1, self.y.size)
 
         batch_size = self.y_hat.shape[0]
         self.loss = -np.sum(self.y * np.log(self.y_hat + eps)) / batch_size
-        # =========================================================================
         return self.loss
 
     def update(self, learning_rate):
@@ -453,7 +434,6 @@ class EvaluationMetric:
         c_m_c = [{'TP': 0, 'FP': 0, 'FN': 0, 'TN': 0} for _ in range(num_of_class)]
         for class_idx in range(num_of_class):
             for idx in range(true.shape[0]):
-                # =============================== EDIT HERE ===============================
                 if pred[idx] == true[idx]:
                     result = 1
                 else:
@@ -468,28 +448,21 @@ class EvaluationMetric:
                     else:
                         c_m_c[class_idx]['TN'] += 1
                     
-                # =========================================================================
         return c_m_c
 
     def precision(self, TP, FP, FN, TN):
         out = None
-        # =============================== EDIT HERE ===============================
         out = TP / (TP + FP)
-        # =========================================================================
         return out
 
     def recall(self, TP, FP, FN, TN):
         out = None
-        # =============================== EDIT HERE ===============================
         out = TP/ (TP + FN)
-        # =========================================================================
         return out
 
     def f_measure(self, precision, recall, beta=1.0):
         out = None
-        # =============================== EDIT HERE ===============================
         out = (beta**2 + 1)*precision*recall/(beta*beta*precision + recall)
-        # =========================================================================
         return out
 
     def multiclass_f_measure(self, pred, true, num_of_class):
