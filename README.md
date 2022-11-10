@@ -2,6 +2,12 @@
 
 2022 fall Introduction to Deep neural network assignment
 
-#pa1
+## pa1
 
-mutlilayer perceptron
+mutlilayer perceptron, gradient descent 구현
+XOR, moon data classification
+
+
+
+
+
